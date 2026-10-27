@@ -169,17 +169,6 @@ int main() {
             camera.translateWindowPercent({playerx - rightHard, 0.f});
         }
 
-        sf::RectangleShape leftSoftLine({4, 720});
-    leftSoftLine.setFillColor(sf::Color(0, 255, 0, 128));
-    leftSoftLine.setOrigin({LINE_WIDTH / 2, 0});
-    leftSoftLine.setPosition({WINDOW_WIDTH / 3.f, 0});
-
-    sf::RectangleShape rightSoftLine({4, 720});
-    rightSoftLine.setFillColor(sf::Color(0, 255, 0, 128));
-    rightSoftLine.setOrigin({LINE_WIDTH / 2, 0});
-    rightSoftLine.setPosition({WINDOW_WIDTH * 2.f / 3.f, 0});
-
-
         worldView.setCenter(camera.getCameraCenter());
         window.clear(sf::Color::Black);
         // world rendering
