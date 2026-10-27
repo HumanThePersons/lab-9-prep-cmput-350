@@ -138,7 +138,47 @@ int main() {
         //
         // Use SOFT_LIMIT_PERCENT and HARD_LIMIT_PERCENT to parameterize the green and red
         // line positions.
-        camera.setCameraCenter({player.position.x, WINDOW_HEIGHT * 0.5f});
+        //camera.setCameraCenter({player.position.x, WINDOW_HEIGHT * 0.5f});
+
+        // find player relative to center
+        // Player's center in normalized window coords (0 = left edge, 1 = right edge).
+        float playerx = camera.worldToWindowPercent(player.position).x;
+
+        // limits in percents
+        float leftSoft  = SOFT_LIMIT_PERCENT;
+        float rightSoft = 1.f - SOFT_LIMIT_PERCENT;
+        float leftHard  = HARD_LIMIT_PERCENT;
+        float rightHard = 1.f - HARD_LIMIT_PERCENT;
+
+        // Soft exclusion zones
+        float softTarget = playerx;  // target of soft shift
+        if (playerx < leftSoft) {
+            softTarget = leftSoft;
+        } 
+        else if (playerx > rightSoft) {
+            softTarget = rightSoft;
+        }
+        // EMA step - s_n = s_(n-1) + alpha * (x_n - s_(n-1))
+        camera.translateWindowPercent({SOFT_CAMERA_ALPHA * (playerx - softTarget), 0.f});
+
+        // Hard exclusion zones - snap so the player's center is never past a red line.
+        playerx = camera.worldToWindowPercent(player.position).x;
+        if (playerx < leftHard) {
+            camera.translateWindowPercent({playerx - leftHard, 0.f});
+        } else if (playerx > rightHard) {
+            camera.translateWindowPercent({playerx - rightHard, 0.f});
+        }
+
+        sf::RectangleShape leftSoftLine({4, 720});
+    leftSoftLine.setFillColor(sf::Color(0, 255, 0, 128));
+    leftSoftLine.setOrigin({LINE_WIDTH / 2, 0});
+    leftSoftLine.setPosition({WINDOW_WIDTH / 3.f, 0});
+
+    sf::RectangleShape rightSoftLine({4, 720});
+    rightSoftLine.setFillColor(sf::Color(0, 255, 0, 128));
+    rightSoftLine.setOrigin({LINE_WIDTH / 2, 0});
+    rightSoftLine.setPosition({WINDOW_WIDTH * 2.f / 3.f, 0});
+
 
         worldView.setCenter(camera.getCameraCenter());
         window.clear(sf::Color::Black);
